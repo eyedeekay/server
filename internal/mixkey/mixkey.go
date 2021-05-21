@@ -29,11 +29,11 @@ import (
 	"time"
 
 	"git.schwanenlied.me/yawning/bloom.git"
-	bolt "go.etcd.io/bbolt"
 	"github.com/katzenpost/core/crypto/ecdh"
 	"github.com/katzenpost/core/crypto/rand"
 	"github.com/katzenpost/core/epochtime"
 	"github.com/katzenpost/core/worker"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

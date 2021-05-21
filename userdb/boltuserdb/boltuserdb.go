@@ -23,9 +23,9 @@ import (
 	"fmt"
 	"sync"
 
-	bolt "go.etcd.io/bbolt"
 	"github.com/katzenpost/core/crypto/ecdh"
 	"github.com/katzenpost/server/userdb"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

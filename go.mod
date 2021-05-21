@@ -10,6 +10,7 @@ require (
 	github.com/coreos/bbolt v1.3.3
 	github.com/dchest/siphash v1.2.1 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/eyedeekay/sam3 v0.32.32 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/katzenpost/authority v0.0.15

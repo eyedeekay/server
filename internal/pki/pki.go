@@ -49,7 +49,7 @@ var (
 	errNotCached         = errors.New("pki: requested epoch document not in cache")
 	recheckInterval      = 1 * time.Minute
 	WarpedEpoch          = "false"
-	nextFetchTill        = epochtime.Period/8
+	nextFetchTill        = epochtime.Period / 8
 	pkiEarlyConnectSlack = epochtime.Period / 6
 )
 
@@ -731,29 +731,34 @@ func New(glue glue.Glue) (glue.PKI, error) {
 func makeDescAddrMap(addrs []string) (map[cpki.Transport][]string, error) {
 	m := make(map[cpki.Transport][]string)
 	for _, addr := range addrs {
-		h, p, err := net.SplitHostPort(addr)
-		if err != nil {
-			return nil, err
-		}
-		if _, err = strconv.ParseUint(p, 10, 16); err != nil {
-			return nil, err
-		}
+		if !strings.HasSuffix(addr, ".i2p") {
+			h, p, err := net.SplitHostPort(addr)
+			if err != nil {
+				return nil, err
+			}
+			if _, err = strconv.ParseUint(p, 10, 16); err != nil {
+				return nil, err
+			}
 
-		var t cpki.Transport
-		ip := net.ParseIP(h)
-		if ip == nil {
-			return nil, fmt.Errorf("address '%v' is not an IP", h)
-		}
-		switch {
-		case ip.To4() != nil:
-			t = cpki.TransportTCPv4
-		case ip.To16() != nil:
-			t = cpki.TransportTCPv6
-		default:
-			return nil, fmt.Errorf("address '%v' is neither IPv4 nor IPv6", h)
-		}
+			var t cpki.Transport
+			ip := net.ParseIP(h)
+			if ip == nil {
+				return nil, fmt.Errorf("address '%v' is not an IP", h)
+			}
+			switch {
+			case ip.To4() != nil:
+				t = cpki.TransportTCPv4
+			case ip.To16() != nil:
+				t = cpki.TransportTCPv6
+			default:
+				return nil, fmt.Errorf("address '%v' is neither IPv4 nor IPv6", h)
+			}
 
-		m[t] = append(m[t], addr)
+			m[t] = append(m[t], addr)
+		} else {
+			t := cpki.TransportTCPv4
+			m[t] = append(m[t], addr)
+		}
 	}
 	return m, nil
 }

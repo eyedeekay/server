@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"git.schwanenlied.me/yawning/aez.git"
@@ -43,6 +44,8 @@ import (
 	"github.com/katzenpost/server/internal/scheduler"
 	"gopkg.in/eapache/channels.v1"
 	"gopkg.in/op/go-logging.v1"
+
+	"github.com/eyedeekay/sam3/helper"
 )
 
 // ErrGenerateOnly is the error returned when the server initialization
@@ -367,12 +370,26 @@ func New(cfg *config.Config) (*Server, error) {
 	// Bring the listener(s) online.
 	s.listeners = make([]glue.Listener, 0, len(s.cfg.Server.Addresses))
 	for i, addr := range s.cfg.Server.Addresses {
-		l, err := incoming.New(goo, s.inboundPackets.In(), i, addr)
-		if err != nil {
-			s.log.Errorf("Failed to spawn listener on address: %v (%v).", addr, err)
-			return nil, err
+		if strings.HasSuffix(addr, ".i2p") {
+			innerListener, err := sam.I2PListener(addr, "127.0.0.1:7656", addr)
+			if err != nil {
+				s.log.Errorf("Failed to generate I2P listener: %v (%v).", addr, err)
+				return nil, err
+			}
+			l, err := incoming.NewListener(goo, s.inboundPackets.In(), i, innerListener)
+			if err != nil {
+				s.log.Errorf("Failed to spawn I2P listener: %v (%v).", addr, err)
+				return nil, err
+			}
+			s.listeners = append(s.listeners, l)
+		} else {
+			l, err := incoming.New(goo, s.inboundPackets.In(), i, addr)
+			if err != nil {
+				s.log.Errorf("Failed to spawn listener on address: %v (%v).", addr, err)
+				return nil, err
+			}
+			s.listeners = append(s.listeners, l)
 		}
-		s.listeners = append(s.listeners, l)
 	}
 
 	s.pki.StartWorker()

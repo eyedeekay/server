@@ -185,3 +185,20 @@ func New(glue glue.Glue, incomingCh chan<- interface{}, id int, addr string) (gl
 	l.Go(l.worker)
 	return l, nil
 }
+
+// NewListener creates a new listener using the listener Interface.
+func NewListener(glue glue.Glue, incomingCh chan<- interface{}, id int, listen net.Listener) (glue.Listener, error) {
+	//	var err error
+
+	l := &listener{
+		glue:       glue,
+		log:        glue.LogBackend().GetLogger(fmt.Sprintf("listener:%d", id)),
+		conns:      list.New(),
+		incomingCh: incomingCh,
+		closeAllCh: make(chan interface{}),
+		l:          listen,
+	}
+
+	l.Go(l.worker)
+	return l, nil
+}

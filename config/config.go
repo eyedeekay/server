@@ -116,8 +116,10 @@ func (sCfg *Server) validate() error {
 
 	if sCfg.Addresses != nil {
 		for _, v := range sCfg.Addresses {
-			if err := utils.EnsureAddrIPPort(v); err != nil {
-				return fmt.Errorf("config: Server: Address '%v' is invalid: %v", v, err)
+			if !strings.HasSuffix(v, ".i2p") {
+				if err := utils.EnsureAddrIPPort(v); err != nil {
+					return fmt.Errorf("config: Server: Address '%v' is invalid: %v", v, err)
+				}
 			}
 		}
 	} else {
@@ -142,17 +144,19 @@ func (sCfg *Server) validate() error {
 		switch pki.Transport(lowkey) {
 		case pki.TransportTCP:
 			for _, a := range v {
-				h, p, err := net.SplitHostPort(a)
-				if err != nil {
-					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", a, err)
-				}
-				if len(h) == 0 {
-					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing host", a)
-				}
-				if port, err := strconv.ParseUint(p, 10, 16); err != nil {
-					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", a, err)
-				} else if port == 0 {
-					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing port", a)
+				if !strings.HasSuffix(a, ".i2p") {
+					h, p, err := net.SplitHostPort(a)
+					if err != nil {
+						return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", a, err)
+					}
+					if len(h) == 0 {
+						return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing host", a)
+					}
+					if port, err := strconv.ParseUint(p, 10, 16); err != nil {
+						return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", a, err)
+					} else if port == 0 {
+						return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing port", a)
+					}
 				}
 			}
 		default:
@@ -574,17 +578,19 @@ func (pCfg *Provider) applyDefaults(sCfg *Server) {
 func (pCfg *Provider) validate() error {
 	if pCfg.EnableUserRegistrationHTTP {
 		for _, addr := range pCfg.UserRegistrationHTTPAddresses {
-			h, p, err := net.SplitHostPort(addr)
-			if err != nil {
-				return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", addr, err)
-			}
-			if len(h) == 0 {
-				return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing host", addr)
-			}
-			if port, err := strconv.ParseUint(p, 10, 16); err != nil {
-				return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", addr, err)
-			} else if port == 0 {
-				return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing port", addr)
+			if !strings.HasSuffix(addr, ".i2p") {
+				h, p, err := net.SplitHostPort(addr)
+				if err != nil {
+					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", addr, err)
+				}
+				if len(h) == 0 {
+					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing host", addr)
+				}
+				if port, err := strconv.ParseUint(p, 10, 16); err != nil {
+					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: %v", addr, err)
+				} else if port == 0 {
+					return fmt.Errorf("config: Provider: AltAddress '%v' is invalid: missing port", addr)
+				}
 			}
 		}
 	}

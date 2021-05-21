@@ -22,12 +22,12 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	bolt "go.etcd.io/bbolt"
 	"github.com/katzenpost/core/constants"
 	"github.com/katzenpost/core/sphinx"
 	sConstants "github.com/katzenpost/core/sphinx/constants"
 	"github.com/katzenpost/server/spool"
 	"github.com/katzenpost/server/userdb"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

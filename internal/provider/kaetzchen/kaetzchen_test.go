@@ -242,7 +242,7 @@ func TestKaetzchenWorker(t *testing.T) {
 				Logging: &config.Logging{},
 				Provider: &config.Provider{
 					Kaetzchen: []*config.Kaetzchen{
-						&config.Kaetzchen{
+						{
 							Capability: "loop",
 							Endpoint:   "loop",
 							Config:     map[string]interface{}{},
